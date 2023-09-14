@@ -2,11 +2,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("AccountLists", {
-      code: {
+    await queryInterface.createTable("Account_lists", {
+      id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      code: {
         type: Sequelize.INTEGER,
       },
       name: {
@@ -18,11 +21,8 @@ module.exports = {
       type: {
         type: Sequelize.STRING,
       },
-      status: {
-        type: Sequelize.STRING,
-      },
-      parent: {
-        type: Sequelize.STRING,
+      parent_code: {
+        type: Sequelize.INTEGER,
       },
       balance: {
         type: Sequelize.DECIMAL,
@@ -38,6 +38,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("AccountLists");
+    await queryInterface.dropTable("Account_lists");
   },
 };
