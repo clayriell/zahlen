@@ -31,3 +31,6 @@ const CATEGORY = {
   EXPENSE: "BIAYA",
   OTHERS: "LAIN-LAIN",
 };
+
+
+module.exports = {TYPE , ROLE , WO_STATUS,INV_STATUS, CATEGORY, }

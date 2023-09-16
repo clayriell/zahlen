@@ -6,8 +6,6 @@ module.exports = {
     try {
       const { code, name, category, type, parent_code } = req.body;
 
-      // Check Code
-
       const codeUsed = await Account_list.findOne({ where: { code } });
       if (codeUsed) {
         return res.status(409).json({
