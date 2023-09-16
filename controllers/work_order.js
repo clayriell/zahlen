@@ -59,4 +59,92 @@ module.exports = {
       next(err);
     }
   },
+
+  //not fixed yet
+  getByStatus: async (req, res, next) => {
+    try {
+      const { status } = req.params;
+      const workOrders = await Work_order.findAll({ where: { status } });
+
+      if (!workOrders.length) {
+        return res.status(200).json({
+          status: false,
+          message: "No Work Orders found!",
+          data: workOrders,
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "Success get processed Work Orders",
+        data: workOrders,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getById: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const workOrder = await Work_order.findOne({ where: { id } });
+
+      if (!workOrder) {
+        return res.status(200).json({
+          status: false,
+          message: "Work Order not found",
+          data: workOrder,
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "success get work order data",
+        data: workOrder,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  update: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { details, customer } = req.body;
+
+      const workOrder = await Work_order.findOne({ where: { id } });
+
+      if (!workOrder) {
+        return req.status(200).json({
+          status: false,
+          message: "Work Order not found",
+          data: workOrder,
+        });
+      }
+
+      const updateWO = await Work_order.update(
+        { details, customer },
+        { where: { id } }
+      );
+
+      const updatedWO = await Work_order.findOne({ where: { id } });
+
+      return res.status(201).json({
+        status: true,
+        message: "Work Order updated successfully",
+        data: updatedWO,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
+  // no done yet
+  submit : async (req, res, next) =>{
+    try {
+      const {id} = req.params
+    } catch (error) {
+      next(error)
+    }
+  }
 };

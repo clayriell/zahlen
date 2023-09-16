@@ -77,6 +77,7 @@ module.exports = {
         { name, category, type, parent_code, balance: accounts.balance },
         { where: { code } }
       );
+
       const updatedAccount = await Account_list.findOne({ where: { code } });
 
       return res.status(201).json({
