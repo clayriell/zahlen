@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/clayriell/zahlen#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.6.1",
     "sequelize": "^6.33.0",

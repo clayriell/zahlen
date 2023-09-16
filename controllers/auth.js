@@ -1,4 +1,10 @@
 require("dotenv").config();
+const { User } = require("../models");
+
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const crypto = require("node:crypto");
+const { JWT_SECRET } = process.env;
 
 module.exports = {
   register: async (req, res, next) => {
@@ -9,15 +15,6 @@ module.exports = {
         return res.status(400).json({
           status: false,
           message: "At least password has 8 character",
-        });
-      }
-
-      // Check Password
-      if (password != confirm_password) {
-        return res.status(400).json({
-          status: false,
-          message: "password doesnt match!",
-          data: null,
         });
       }
 
@@ -44,8 +41,7 @@ module.exports = {
         status: true,
         message: "Register success!",
         data: {
-          userma,
-          e: newUser.username,
+          username: newUser.username,
           email: newUser.email,
           password: newUser.password,
         },
@@ -77,7 +73,7 @@ module.exports = {
       }
 
       const payload = {
-        id: user.id,
+        username: user.username,
         role: user.role,
       };
       const token = jwt.sign(payload, JWT_SECRET);
@@ -119,7 +115,7 @@ module.exports = {
   },
   resetPassword: async (req, res, next) => {
     try {
-      const { token } = req.params;
+      const token = req.headers["authorization"];
       const { password, confirm_new_password } = req.body;
 
       if (!token)
@@ -146,7 +142,7 @@ module.exports = {
 
       const user = await User.update(
         { password: encryptedPassword },
-        { where: { id: payload.user_id } }
+        { where: { username: payload.username } }
       );
 
       return res.status(200).json({
