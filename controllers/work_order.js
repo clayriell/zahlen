@@ -149,20 +149,26 @@ module.exports = {
       if (invoice) {
         return res.status(200).json({
           status: false,
-          message: "invoice already created",
+          message: "invoice number already used",
           data: invoice,
         });
       }
       const workOrder = await Work_order.findOne({ where: { id } });
-      
-      if(!workOrder){
-        return res.status(200).json({
-          status: false , 
-          message  : "Work Order no found!", 
-          data : workOrder
-        })
-      }
 
+      if (!workOrder) {
+        return res.status(200).json({
+          status: false,
+          message: "Work Order no found!",
+          data: workOrder,
+        });
+      }
+      if (workOrder.status == WO_STATUS.PROCESSED) {
+        return res.status(200).json({
+          status: false,
+          message: "Work order already submitted, please check the invoice",
+          data: workOrder,
+        });
+      }
       const user = jwt.verify(token, JWT_SECRET);
 
       const createInvoice = await Invoice.create({
@@ -175,7 +181,6 @@ module.exports = {
         is_paid: false,
         maturity_date,
         paid_date: null,
-        transaction_id: null,
         amount: 0,
       });
       const updateWO = await Work_order.update(
@@ -184,8 +189,10 @@ module.exports = {
       );
 
       return res.status(200).json({
-        status : true, message : "Invoice created!" , data : createInvoice
-      })
+        status: true,
+        message: "Invoice created!",
+        data: createInvoice,
+      });
     } catch (error) {
       next(error);
     }
