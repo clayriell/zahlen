@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { Work_order, Invoice } = require("../models");
+const { Work_order, Invoice, User } = require("../models");
 const { WO_STATUS, INV_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
@@ -145,7 +145,7 @@ module.exports = {
       const token = req.headers["authorization"];
       const { number, maturity_date } = req.body;
 
-      const invoice = await Invoice.findOne({ where: { number } });
+      const invoice = await Invoice.findOne({ where: { id: number } });
       if (invoice) {
         return res.status(200).json({
           status: false,
@@ -172,7 +172,7 @@ module.exports = {
       const user = jwt.verify(token, JWT_SECRET);
 
       const createInvoice = await Invoice.create({
-        number,
+        id: number,
         customer: workOrder.customer,
         ref: `WO/SCP/${id}`,
         note: workOrder.details,

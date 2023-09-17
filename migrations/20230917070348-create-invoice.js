@@ -1,55 +1,51 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Invoices', {
+    await queryInterface.createTable("Invoices", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      number: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       customer: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       ref: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       amount: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL,
       },
       note: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       user: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       is_paid: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
       },
       maturity_date: {
-        type: Sequelize.DATEONLY
+        type: Sequelize.DATEONLY,
       },
       paid_date: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Invoices');
-  }
+    await queryInterface.dropTable("Invoices");
+  },
 };

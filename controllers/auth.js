@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { User } = require("../models");
+const { User, Work_order } = require("../models");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -19,7 +19,7 @@ module.exports = {
       }
 
       // Check User
-      const userExist = await User.findOne({ where: { username } });
+      const userExist = await User.findOne({ where: { id: username } });
       if (userExist) {
         return res.status(409).json({
           status: false,
@@ -31,7 +31,7 @@ module.exports = {
       const encryptedPassword = await bcrypt.hash(password, 10);
       const token = crypto.randomBytes(30).toString("hex");
       const newUser = await User.create({
-        username,
+        id: username,
         email,
         password: encryptedPassword,
         role,
@@ -41,7 +41,7 @@ module.exports = {
         status: true,
         message: "Register success!",
         data: {
-          username: newUser.username,
+          username: newUser.id,
           email: newUser.email,
           password: newUser.password,
         },
@@ -54,7 +54,7 @@ module.exports = {
     try {
       const { username, password } = req.body;
 
-      const user = await User.findOne({ where: { username } });
+      const user = await User.findOne({ where: { id: username } });
       if (!user) {
         return res.status(404).json({
           status: false,
@@ -73,7 +73,7 @@ module.exports = {
       }
 
       const payload = {
-        username: user.username,
+        username: user.id,
         role: user.role,
       };
       const token = jwt.sign(payload, JWT_SECRET);
@@ -82,7 +82,7 @@ module.exports = {
         status: true,
         message: "login successful!",
         data: {
-          username: user.username,
+          username: user.id,
           role: user.role,
           token: token,
         },
@@ -94,7 +94,15 @@ module.exports = {
 
   getAll: async (req, res, next) => {
     try {
-      const user = await User.findAll();
+      const user = await User.findAll({
+        include: [
+          {
+            model: Work_order,
+            as: "work_orders",
+            attributes: ["id", "details", "ammount"],
+          },
+        ],
+      });
 
       if (!user.length) {
         return res.status(200).json({
@@ -142,7 +150,7 @@ module.exports = {
 
       const user = await User.update(
         { password: encryptedPassword },
-        { where: { username: payload.username } }
+        { where: { id: payload.username } }
       );
 
       return res.status(200).json({
