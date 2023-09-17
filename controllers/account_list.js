@@ -4,10 +4,10 @@ const { Account_list } = require("../models");
 module.exports = {
   create: async (req, res) => {
     try {
-      const { code, name, category, type, parent_code } = req.body;
+      const { id, name, category, type, parent_code } = req.body;
 
-      const codeUsed = await Account_list.findOne({ where: { code } });
-      if (codeUsed) {
+      const idUsed = await Account_list.findOne({ where: { id } });
+      if (idUsed) {
         return res.status(409).json({
           status: false,
           message: "account code already exist!",
@@ -15,7 +15,7 @@ module.exports = {
         });
       }
       const newAccount = await Account_list.create({
-        code,
+        id,
         name,
         category,
         type,
@@ -27,7 +27,7 @@ module.exports = {
         status: true,
         message: "Register success!",
         data: {
-          code: newAccount.code,
+          code: newAccount.id,
           name: newAccount.name,
           category: newAccount.category,
           type: newAccount.type,
@@ -64,7 +64,7 @@ module.exports = {
     try {
       const { code } = req.params;
       const { name, category, type, parent_code } = req.body;
-      const accounts = await Account_list.findOne({ where: { code } });
+      const accounts = await Account_list.findOne({ where: { id : code } });
       if (!accounts) {
         return res.status(400).json({
           status: false,
@@ -75,7 +75,7 @@ module.exports = {
 
       const updateAccount = await Account_list.update(
         { name, category, type, parent_code, balance: accounts.balance },
-        { where: { code } }
+        { where: { id : code } }
       );
 
       const updatedAccount = await Account_list.findOne({ where: { code } });
@@ -91,9 +91,9 @@ module.exports = {
   },
   delete: async (req, res, next) => {
     try {
-      const { code } = req.params;
+      const { id } = req.params;
 
-      const accountExist = await Account_list.findOne({ where: { code } });
+      const accountExist = await Account_list.findOne({ where: { id } });
       if (!accountExist) {
         return res.status(200).json({
           status: false,

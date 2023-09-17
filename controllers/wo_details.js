@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { WorkOrder_details, Work_order } = require("../models");
+const { WorkOrder_details, Work_order , Account_list} = require("../models");
 const { WO_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
@@ -19,7 +19,12 @@ module.exports = {
         });
       }
       const user = jwt.verify(token, JWT_SECRET);
-
+      // const account_number = await Account_list.findOne({where : {code : account_code}})
+      // if (!account_number){
+      //   return res.status(200).json({
+      //     stauts : false, message : "account_code doesn't exist", data : account_number
+      //   })
+      // }
       const WO_detail = await WorkOrder_details.create({
         wo_id,
         account_code,
@@ -41,7 +46,16 @@ module.exports = {
   getByWoId: async (req, res, next) => {
     try {
       const { wo_id } = req.params;
-      const WoDetail = await WorkOrder_details.findAll({ where: { wo_id } });
+      const WoDetail = await WorkOrder_details.findAll({
+        include: [
+          {
+            model: Account_list,
+            as: "account",
+            attributes: ["id", "name"],
+          },
+        ],
+        where: { wo_id },
+      });
       const WorkOrder = await Work_order.findOne({ where: { id: wo_id } });
       if (!WorkOrder) {
         return res.status(200).json({
@@ -88,7 +102,9 @@ module.exports = {
         { account_code, amount, description, user: user.username },
         { where: { id } }
       );
-      const updateWO = await Work_order.update ({status : WO_STATUS.IN_PROCESS})
+      const updateWO = await Work_order.update({
+        status: WO_STATUS.IN_PROCESS,
+      });
 
       const updatedDetail = await WorkOrder_details.findOne({ where: { id } });
       return res.status(201).json({
