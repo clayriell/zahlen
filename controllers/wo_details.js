@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
 const { WorkOrder_details, Work_order } = require("../models");
+const { WO_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
 module.exports = {
@@ -71,7 +72,7 @@ module.exports = {
     try {
       const { id } = req.params;
       const { account_code, amount, description } = req.body;
-      const token  = req.headers["authorization"];
+      const token = req.headers["authorization"];
       const WoDetail = await WorkOrder_details.findOne({ where: { id } });
 
       if (!WoDetail) {
@@ -87,9 +88,10 @@ module.exports = {
         { account_code, amount, description, user: user.username },
         { where: { id } }
       );
+      const updateWO = await Work_order.update ({status : WO_STATUS.IN_PROCESS})
 
       const updatedDetail = await WorkOrder_details.findOne({ where: { id } });
-      return res.status(200).json({
+      return res.status(201).json({
         status: true,
         message: "item updated",
         data: updatedDetail,

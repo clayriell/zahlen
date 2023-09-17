@@ -1,8 +1,8 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { Work_order } = require("../models");
-const { WO_STATUS } = require("../utils/enum");
+const { Work_order, Invoice } = require("../models");
+const { WO_STATUS, INV_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
 module.exports = {
@@ -138,13 +138,56 @@ module.exports = {
     }
   },
 
-
-  // no done yet
-  submit : async (req, res, next) =>{
+  // no done yet // amount
+  submit: async (req, res, next) => {
     try {
-      const {id} = req.params
+      const { id } = req.params;
+      const token = req.headers["authorization"];
+      const { number, maturity_date } = req.body;
+
+      const invoice = await Invoice.findOne({ where: { number } });
+      if (invoice) {
+        return res.status(200).json({
+          status: false,
+          message: "invoice already created",
+          data: invoice,
+        });
+      }
+      const workOrder = await Work_order.findOne({ where: { id } });
+      
+      if(!workOrder){
+        return res.status(200).json({
+          status: false , 
+          message  : "Work Order no found!", 
+          data : workOrder
+        })
+      }
+
+      const user = jwt.verify(token, JWT_SECRET);
+
+      const createInvoice = await Invoice.create({
+        number,
+        customer: workOrder.customer,
+        ref: `WO/SCP/${id}`,
+        note: workOrder.details,
+        status: INV_STATUS.UNPAID,
+        user: user.username,
+        is_paid: false,
+        maturity_date,
+        paid_date: null,
+        transaction_id: null,
+        amount: 0,
+      });
+      const updateWO = await Work_order.update(
+        { status: WO_STATUS.PROCESSED, submitted_by: user.username },
+        { where: { id } }
+      );
+
+      return res.status(200).json({
+        status : true, message : "Invoice created!" , data : createInvoice
+      })
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
+  },
 };
