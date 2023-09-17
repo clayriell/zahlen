@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "account_code",
         as: "account",
       });
+      Transaction_details.belongsTo(models.User, {
+        foreignKey: "user",
+        as: "transactions",
+      });
     }
   }
   Transaction_details.init(

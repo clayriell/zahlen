@@ -1,5 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
+const Work_order = require("./Work_order");
 module.exports = (sequelize, DataTypes) => {
   class WorkOrder_details extends Model {
     /**
@@ -12,6 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       WorkOrder_details.belongsTo(models.Account_list, {
         foreignKey: "account_code",
         as: "account",
+      });
+      WorkOrder_details.belongsTo(models.User, {
+        foreignKey: "user",
+        as: "editor",
+      });
+      WorkOrder_details.belongsTo(models.Work_order, {
+        foreignKey: "wo_id",
+        as: "items",
       });
     }
   }

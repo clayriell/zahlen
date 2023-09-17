@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { Invoice } = require("../models");
+const { Invoice, User } = require("../models");
 const { WO_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
@@ -24,27 +24,30 @@ module.exports = {
       });
     } catch (error) {}
   },
-  getByNumber : async (req, res, next)=>{
+  getByNumber: async (req, res, next) => {
     try {
-        const {number} = req.params
+      const number = req.query.number;
 
-        const invoice = await Invoice.findOne({where : {number}})
+      const invoice = await Invoice.findOne(
+        { include: [{ model: User, as: "updater", attributes: ["email"] }] },
+        { where: { id: number } }
+      );
 
-        if(!invoice){
-            return res.status(200).json({
-                status : false ,
-                message : "invoice not found",
-                data : invoice
-            })
-        }
-
+      if (!invoice) {
         return res.status(200).json({
-            status : true , 
-            message :"success get invoice data",
-            data : invoice
-        })
+          status: false,
+          message: "invoice not found",
+          data: invoice,
+        });
+      }
+
+      return res.status(200).json({
+        status: true,
+        message: "success get invoice data",
+        data: invoice,
+      });
     } catch (error) {
-        next(error)
+      next(error);
     }
-  }
+  },
 };

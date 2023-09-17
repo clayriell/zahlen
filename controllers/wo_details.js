@@ -1,7 +1,12 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { WorkOrder_details, Work_order , Account_list} = require("../models");
+const {
+  WorkOrder_details,
+  Work_order,
+  Account_list,
+  User,
+} = require("../models");
 const { WO_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
@@ -53,6 +58,7 @@ module.exports = {
             as: "account",
             attributes: ["id", "name"],
           },
+          { model: User, as: "editor", attributes: ["id"] },
         ],
         where: { wo_id },
       });
