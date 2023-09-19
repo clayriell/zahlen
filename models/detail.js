@@ -1,8 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-const Work_order = require("./Work_order");
 module.exports = (sequelize, DataTypes) => {
-  class WorkOrder_details extends Model {
+  class Detail extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -10,32 +9,40 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      WorkOrder_details.belongsTo(models.Account_list, {
+      Detail.belongsTo(models.Account_list, {
         foreignKey: "account_code",
         as: "account",
       });
-      WorkOrder_details.belongsTo(models.User, {
-        foreignKey: "user",
-        as: "editor",
+      Detail.belongsTo(models.User, {
+        foreignKey: "id",
+        as: "details",
       });
-      WorkOrder_details.belongsTo(models.Work_order, {
+      Detail.belongsTo(models.Transaction, {
+        foreignKey: "transaction_id",
+        as: "transaction_details",
+      });
+      Detail.belongsTo(models.Work_order, {
         foreignKey: "wo_id",
-        as: "items",
+        as: "wo_details",
       });
     }
   }
-  WorkOrder_details.init(
+  Detail.init(
     {
-      wo_id: DataTypes.INTEGER,
+      category: DataTypes.STRING,
       account_code: DataTypes.INTEGER,
       amount: DataTypes.DECIMAL,
       description: DataTypes.STRING,
+      type: DataTypes.STRING,
       user: DataTypes.STRING,
+      status: DataTypes.STRING,
+      wo_id: DataTypes.INTEGER,
+      transaction_id: DataTypes.INTEGER,
     },
     {
       sequelize,
-      modelName: "WorkOrder_details",
+      modelName: "Detail",
     }
   );
-  return WorkOrder_details;
+  return Detail;
 };

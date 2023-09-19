@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "applicant",
         as: "work_orders",
       });
-      User.hasMany(models.WorkOrder_details, {
+      User.hasMany(models.Detail, {
         foreignKey: "user",
         as: "items_added",
       });
@@ -25,10 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user",
         as: "created_by",
       });
-      User.hasMany(models.Transaction_details, {
-        foreignKey: "user",
-        as: "user",
-      });
+      
     }
   }
   User.init(

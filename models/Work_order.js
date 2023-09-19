@@ -13,9 +13,9 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "applicant",
         as: "user",
       });
-      Work_order.hasMany(models.WorkOrder_details, {
+      Work_order.hasMany(models.Detail, {
         foreignKey: "wo_id",
-        as: "Work_order",
+        as: "wo_details",
       });
     }
   }

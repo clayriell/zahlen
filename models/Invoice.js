@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user",
         as: "updater",
       });
+      Invoice.hasMany(models.Transaction, {
+        foreignKey: "ref",
+        as: "transcations",
+      });
     }
   }
   Invoice.init(
