@@ -1,21 +1,25 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const {
-  WorkOrder_details,
-  Work_order,
-  Account_list,
-  User,
-} = require("../models");
-const { WO_STATUS } = require("../utils/enum");
+const { Work_order, Account_list, User, Detail } = require("../models");
+const { DETAILS_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
 module.exports = {
-  create: async (req, res, next) => {
+  addByWO: async (req, res, next) => {
     try {
       const { wo_id } = req.params;
-      const { account_code, amount, description } = req.body;
+      const { account_code, amount, description, type } = req.body;
       const token = req.headers["authorization"];
+
+      const WoExist = await Work_order.findOne({ where: { id: wo_id } });
+      if (!WoExist) {
+        return res.status(200).json({
+          status: false,
+          message: "Work Order doesn't exist",
+          data: WoExist,
+        });
+      }
 
       if (!token) {
         return res.status(401).json({
@@ -30,18 +34,28 @@ module.exports = {
       //     stauts : false, message : "account_code doesn't exist", data : account_number
       //   })
       // }
-      const WO_detail = await WorkOrder_details.create({
-        wo_id,
+      const detail = await Detail.create({
+        category: null,
         account_code,
-        amount,
+        amount: parseFloat(amount),
         description,
+        type,
         user: user.username,
+        status: DETAILS_STATUS.WO,
+        wo_id: parseInt(wo_id),
+        transaction_id: null,
       });
+
+      const sumDetail = await Detail.sum("amount", { where: { wo_id } });
+      const workOrder = await Work_order.update(
+        { amount: sumDetail },
+        { where: { id: wo_id } }
+      );
 
       return res.status(200).json({
         status: true,
         message: "details added!",
-        data: WO_detail,
+        data: detail,
       });
     } catch (error) {
       next(error);
@@ -51,17 +65,17 @@ module.exports = {
   getByWoId: async (req, res, next) => {
     try {
       const { wo_id } = req.params;
-      const WoDetail = await WorkOrder_details.findAll({
+      const detail = await Detail.findAll({
         include: [
           {
             model: Account_list,
             as: "account",
             attributes: ["id", "name"],
           },
-          { model: User, as: "editor", attributes: ["id"] },
         ],
         where: { wo_id },
       });
+
       const WorkOrder = await Work_order.findOne({ where: { id: wo_id } });
       if (!WorkOrder) {
         return res.status(200).json({
@@ -70,24 +84,26 @@ module.exports = {
           data: WorkOrder,
         });
       }
-      if (!WoDetail.length) {
+
+      if (!detail.length) {
         return res.status(200).json({
           status: false,
           message: "Add Detail",
-          data: WoDetail,
+          data: detail,
         });
       }
 
       return res.status(200).json({
         status: true,
         message: "success get work order details!",
-        data: WoDetail,
+        data: detail,
       });
     } catch (error) {
       next(error);
     }
   },
 
+  //need to fix
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -127,8 +143,22 @@ module.exports = {
     try {
       const { id } = req.params;
 
-      const deleteDetail = await WorkOrder_details.destroy({ where: { id } });
-
+      const detail = await Detail.findOne({ where: { id } });
+      if (!detail) {
+        return res.status(200).json({
+          status: false,
+          message: "detail not found",
+          data: detail,
+        });
+      }
+      const deleteDetail = await Detail.destroy({ where: { id } });
+      const sumAmount = await Detail.sum("amount", {
+        where: { wo_id: detail.wo_id },
+      });
+      const updateAmount = await Work_order.update(
+        { amount: sumAmount },
+        { where: { id: detail.wo_id } }
+      );
       return res.status(200).json({
         status: true,
         message: "item deleted",

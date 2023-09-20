@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
-const { Invoice, User } = require("../models");
+const { Invoice, User, Detail, Work_order } = require("../models");
 const { WO_STATUS } = require("../utils/enum");
 const { JWT_SECRET } = process.env;
 
@@ -29,7 +29,15 @@ module.exports = {
       const number = req.query.number;
 
       const invoice = await Invoice.findOne(
-        { include: [{ model: User, as: "updater", attributes: ["email"] }] },
+        {
+          include: [
+            {
+              model: Work_order,
+              as: "work_order",
+              include: [{ model: Detail, as: "wo_details" }],
+            },
+          ],
+        },
         { where: { id: number } }
       );
 

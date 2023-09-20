@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         as: "account",
       });
       Detail.belongsTo(models.User, {
-        foreignKey: "id",
-        as: "details",
+        foreignKey: "user",
+        as: "editor",
       });
       Detail.belongsTo(models.Transaction, {
         foreignKey: "transaction_id",
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Detail.belongsTo(models.Work_order, {
         foreignKey: "wo_id",
-        as: "wo_details",
+        as: "work_oder",
       });
     }
   }

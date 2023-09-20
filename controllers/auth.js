@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { User, Work_order } = require("../models");
+const { User } = require("../models");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -94,15 +94,7 @@ module.exports = {
 
   getAll: async (req, res, next) => {
     try {
-      const user = await User.findAll({
-        include: [
-          {
-            model: Work_order,
-            as: "work_orders",
-            attributes: ["id", "details", "ammount"],
-          },
-        ],
-      });
+      const user = await User.findAll();
 
       if (!user.length) {
         return res.status(200).json({
@@ -121,6 +113,7 @@ module.exports = {
       next(err);
     }
   },
+
   resetPassword: async (req, res, next) => {
     try {
       const token = req.headers["authorization"];

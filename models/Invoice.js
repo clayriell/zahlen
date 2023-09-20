@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, InvalidConnectionError } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Invoice extends Model {
     /**
@@ -14,8 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         as: "updater",
       });
       Invoice.hasMany(models.Transaction, {
-        foreignKey: "ref",
+        foreignKey: "transaction_id",
         as: "transcations",
+      });
+      Invoice.belongsTo(models.Work_order, {
+        foreignKey: "ref",
+        as: "work_order",
       });
     }
   }

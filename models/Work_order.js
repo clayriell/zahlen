@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "wo_id",
         as: "wo_details",
       });
+      Work_order.hasOne(models.Invoice, {
+        foreignKey: "ref",
+        as: "invoice",
+      });
     }
   }
   Work_order.init(
@@ -25,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       details: DataTypes.STRING,
       customer: DataTypes.STRING,
       submitted_by: DataTypes.STRING,
-      ammount: DataTypes.DECIMAL,
+      amount: DataTypes.DECIMAL,
       status: DataTypes.STRING,
     },
     {
