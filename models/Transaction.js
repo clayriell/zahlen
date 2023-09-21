@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       });
       Transaction.hasMany(models.Detail, {
         foreignKey: "transaction_id",
-        as: "transaction",
+        as: "transaction_detail",
       });
       Transaction.belongsTo(models.Invoice, {
         foreignKey: "ref",

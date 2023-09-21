@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         as: "updater",
       });
       Invoice.hasMany(models.Transaction, {
-        foreignKey: "transaction_id",
-        as: "transcations",
+        foreignKey: "ref",
+        as: "transactions",
       });
       Invoice.belongsTo(models.Work_order, {
         foreignKey: "ref",
